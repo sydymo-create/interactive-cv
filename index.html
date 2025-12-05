@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sylvia Morrison — Interactive Web CV</title>
+  <meta name="description" content="Interactive web CV for Sylvia Morrison — Event Designer, VIP Show Rep, Artist Liaison." />
+  <meta name="author" content="Sylvia Morrison" />
+  <!--
+    Single-file interactive web CV
+    How to use: save as index.html and open in any modern browser. No build step required.
+    Images use placeholders; replace with your own assets in the /assets/ folder or direct URLs.
+  -->
+  <style>
+    /* ---------------------------
+       Simple modern styles (no external frameworks)
+       Accessible color palette, responsive layout
+       --------------------------- */
+    :root{
+      --bg:#0f1724; /* dark slate */
+      --card:#0b1220;
+      --accent:#e76f51; /* warm coral */
+      --accent-2:#2a9d8f; /* teal */
+      --muted:#94a3b8;
+      --glass: rgba(255,255,255,0.04);
+      --max-width:1100px;
+      --radius:14px;
+      --shadow: 0 8px 30px rgba(2,6,23,0.6);
+      color-scheme: dark;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;padding:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background:linear-gradient(180deg,var(--bg),#071025);color:#e6eef6;line-height:1.45;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    }
+    a{color:var(--accent);text-decoration:none}
+    header{position:sticky;top:12px;z-index:40;backdrop-filter: blur(6px);}
+    .container{max-width:var(--max-width);margin:0 auto;padding:28px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .avatar{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#041018;box-shadow:0 6px 18px rgba(0,0,0,0.5)}
+    h1{font-size:clamp(20px,3vw,32px);margin:0}
+    .subtitle{color:var(--muted);font-size:14px}
+
+    /* Hero */
+    .hero{display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:start;padding:48px 0}
+    .hero-card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:28px;border-radius:var(--radius);box-shadow:var(--shadow)}
+    .hero-intro{font-size:18px;margin-bottom:14px}
+    .cta{display:flex;gap:12px;margin-top:18px}
+    .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:#041018;font-weight:700}
+
+    /* Sections */
+    section{padding:36px 0;border-top:1px solid rgba(255,255,255,0.02)}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+    .col-8{grid-column:span 8}
+    .col-4{grid-column:span 4}
+    .card{background:var(--card);padding:20px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
+    .interactive-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+    .tile{padding:16px;border-radius:12px;background:var(--glass);border:1px solid rgba(255,255,255,0.02);cursor:pointer}
+    .tile h3{margin:0 0 8px 0}
+    .skills-slider{display:flex;gap:10px;overflow:auto;padding-bottom:6px}
+    .skill-pill{white-space:nowrap;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03)}
+
+    /* Parallax section */
+    .parallax{position:relative;overflow:hidden;border-radius:12px;padding:36px;background:linear-gradient(180deg,rgba(42,157,143,0.06),rgba(231,111,81,0.02));}
+    .parallax::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 10% 10%, rgba(42,157,143,0.03), transparent 10%), radial-gradient(circle at 90% 90%, rgba(231,111,81,0.03), transparent 10%);pointer-events:none}
+
+    /* Footer */
+    footer{padding:28px 0;color:var(--muted);font-size:13px;text-align:center}
+
+    /* Responsive */
+    @media (max-width:900px){
+      .hero{grid-template-columns:1fr;}
+      .col-8,.col-4{grid-column:1/-1}
+      .topbar{flex-direction:column;align-items:flex-start}
+      .brand{gap:10px}
+    }
+
+    /* Focus outlines for accessibility */
+    .btn:focus, .tile:focus, a:focus{outline:3px solid rgba(58,134,129,0.18);outline-offset:3px}
+
+    /* Small utilities */
+    .muted{color:var(--muted)}
+    .small{font-size:13px}
+    .lead{font-size:15px;color:#dbeaf1}
+    .meta{color:var(--muted);font-size:13px}
+
+    /* Download button area */
+    .download-actions{display:flex;flex-wrap:wrap;gap:10px}
+  </style>
+</head>
+<body>
+  <header aria-label="Primary navigation">
+    <div class="container topbar">
+      <div class="brand">
+        <div class="avatar" aria-hidden="true">SM</div>
+        <div>
+          <h1>Sylvia Morrison</h1>
+          <div class="subtitle">Event Designer · VIP Show Rep · Artist Liaison · MSc Event Design & Management</div>
+        </div>
+      </div>
+      <nav aria-label="Profile actions">
+        <div class="download-actions" role="navigation">
+          <button class="btn primary" id="contactBtn" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Contact</button>
+          <a class="btn" href="#featured" onclick="document.getElementById('featured').scrollIntoView({behavior:'smooth'})">Portfolio</a>
+          <a class="btn" id="downloadCV" href="#" role="button">Download CV</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container hero">
+      <div class="hero-card">
+        <p class="hero-intro">Creating immersive, inclusive and culturally resonant live experiences. London-based event professional with strong operational experience and a creative approach to experiential design.</p>
+        <p class="lead">Specialisms: Artist liaison, VIP & backstage operations, festival logistics, merchandise operations, accessibility-aware design, sustainability-minded production.</p>
+
+        <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn primary" href="#experience" onclick="document.getElementById('experience').scrollIntoView({behavior:'smooth'})">View Experience</a>
+          <a class="btn" href="#responsible" onclick="document.getElementById('responsible').scrollIntoView({behavior:'smooth'})">Responsible Leadership</a>
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:18px 0">
+        <div class="meta">Currently: Master’s in Event Design & Management — University of Westminster</div>
+        <div style="margin-top:14px" class="meta">Based in: London · Available for freelance & leadership roles</div>
+      </div>
+
+      <aside class="card" aria-labelledby="contactHeading">
+        <h3 id="contactHeading">Contact & Quick Links</h3>
+        <p class="small muted">Email: <a href="mailto:sydymo@googlemail.com">sydymo@googlemail.com</a></p>
+        <p class="small muted">Phone: 07961 936070</p>
+        <p class="small muted">Location: London, UK</p>
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.02)"/>
+        <p class="small">Featured: <a href="#featured">Portfolio</a> · <a href="#skills">Skills</a> · <a href="#experience">Experience</a></p>
+        <div style="margin-top:14px">
+          <a class="btn" href="https://www.linkedin.com" aria-label="Open LinkedIn profile" target="_blank" rel="noopener">LinkedIn</a>
+          <a class="btn" href="#" aria-label="Open portfolio" onclick="alert('Replace with actual portfolio link or host files')">Portfolio</a>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Experience -->
+    <section id="experience" class="container">
+      <div class="grid">
+        <div class="col-8">
+          <h2>Experience Highlights</h2>
+          <p class="muted">A selection of roles, responsibilities and achievements that demonstrate my operational and creative capabilities.</p>
+
+          <div class="interactive-tiles" id="tiles">
+            <article class="tile" tabindex="0" aria-labelledby="tile1">
+              <h3 id="tile1">VIP Show Representative — One More Time VIP (2025–Present)</h3>
+              <p class="small muted">Artist-facing operations · Backstage hospitality · Meet & greet logistics</p>
+              <p class="small">Managed VIP operations for high-profile artists including Marilyn Manson and Michael Sanzone. Coordinated hospitality, quick-response issue resolution and artist liaison duties across multi-stage events.</p>
+            </article>
+
+            <article class="tile" tabindex="0" aria-labelledby="tile2">
+              <h3 id="tile2">Artist Liaison & Festival Ops — Freelance</h3>
+              <p class="small muted">Rider fulfilment · Transport coordination · Accreditation management</p>
+              <p class="small">Worked across festivals including Queens Yard Summer Party, Waterworks, Gala, DNB Allstars and High Lights. Ensured smooth load-ins, artist schedules and safe backstage flow.</p>
+            </article>
+
+            <article class="tile" tabindex="0" aria-labelledby="tile3">
+              <h3 id="tile3">Merchandise Operations — DragCon UK</h3>
+              <p class="small muted">High-volume retail · Queue management · Stock reconciliation</p>
+              <p class="small">Led merchandise logistics for DragCon UK: managed stock control, VIP merch distribution and high-volume customer interactions while maintaining brand standards and fast reconciliation.</p>
+            </article>
+
+            <article class="tile" tabindex="0" aria-labelledby="tile4">
+              <h3 id="tile4">Cost Drafter — Legal</h3>
+              <p class="small muted">Negotiation · Documentation · Compliance</p>
+              <p class="small">Developed cost drafting expertise within a legal setting. Strengthened negotiation, written communication and evidence-based decision making — critical skills transferred to event contracting and supplier management.</p>
+            </article>
+
+            <article class="tile" tabindex="0" aria-labelledby="tile5">
+              <h3 id="tile5">Event Coordinator — National Charity</h3>
+              <p class="small muted">Community engagement · Volunteer coordination · Fundraising events</p>
+              <p class="small">Planned community-facing events with volunteer teams, focusing on inclusive practices and measurable outcomes for stakeholders.</p>
+            </article>
+          </div>
+        </div>
+
+        <aside class="col-4">
+          <div class="card">
+            <h3 id="featured">Featured Projects</h3>
+            <p class="small muted">Click to preview — replace placeholder images with real assets in /assets/</p>
+            <div style="display:grid;gap:10px;margin-top:12px">
+              <figure style="margin:0">
+                <img src="https://picsum.photos/seed/dragcon/600/360" alt="DragCon UK merchandise operations" style="width:100%;height:auto;border-radius:8px;display:block"/>
+                <figcaption class="small muted">DragCon UK — Merch & VIP ops</figcaption>
+              </figure>
+
+              <figure style="margin:0">
+                <img src="https://picsum.photos/seed/festival/600/360" alt="Festival backstage operations" style="width:100%;height:auto;border-radius:8px;display:block"/>
+                <figcaption class="small muted">Festival artist liaison & accreditation</figcaption>
+              </figure>
+            </div>
+            <div style="margin-top:14px">
+              <a class="btn" href="#contact" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Hire me for freelance</a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Skills -->
+    <section id="skills" class="container">
+      <div class="grid">
+        <div class="col-8">
+          <h2>Skills & Emerging Trends</h2>
+          <p class="muted">Core competencies and the contemporary skills employers are searching for in the events industry.</p>
+
+          <div class="card" style="margin-top:12px">
+            <div class="skills-slider" role="list" aria-label="Key skills">
+              <span class="skill-pill">Artist Liaison</span>
+              <span class="skill-pill">VIP Management</span>
+              <span class="skill-pill">Event Operations</span>
+              <span class="skill-pill">Crisis Response</span>
+              <span class="skill-pill">Accessibility Design</span>
+              <span class="skill-pill">Sustainability Awareness</span>
+              <span class="skill-pill">Merchandise Operations</span>
+              <span class="skill-pill">Stakeholder Communication</span>
+              <span class="skill-pill">Immersive Experience Design</span>
+              <span class="skill-pill">Data-informed Planning</span>
+              <span class="skill-pill">ISO 20121 Familiarity</span>
+            </div>
+          </div>
+
+        </div>
+        <div class="col-4">
+          <div class="card">
+            <h3>Recommendations</h3>
+            <p class="small muted">Tailor these to the job adverts you target: emphasise negotiation, accessibility, sustainability and emergency response experience.</p>
+            <ul class="small muted">
+              <li>Include exact event metrics where possible (attendee numbers, sales).</li>
+              <li>List relevant certifications or training (First Aid, SIA, etc.).</li>
+              <li>Embed short testimonials from artist managers or producers.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Responsible Leadership -->
+    <section id="responsible" class="container">
+      <div class="parallax">
+        <div class="grid">
+          <div class="col-8">
+            <h2>Responsible & Ethical Leadership</h2>
+            <p class="muted">Events are for people. My leadership is rooted in ethics, inclusion and environmental stewardship.</p>
+            <ul style="margin-top:12px" class="small">
+              <li><strong>Ethical Decision-Making:</strong> Transparent communication, fair contracting, safe work culture.</li>
+              <li><strong>Diversity & Inclusion:</strong> Programming and accessibility to welcome diverse communities.</li>
+              <li><strong>Environmental Responsibility:</strong> Supplier selection, waste reduction, energy-efficient production choices.</li>
+            </ul>
+            <p class="small muted" style="margin-top:12px">I actively embed these principles into event planning and artist care, balancing creative ambition with duty of care.</p>
+          </div>
+          <div class="col-4">
+            <div class="card">
+              <h3>Impact Goals</h3>
+              <p class="small">Short-term: adopt supplier code of conduct & reduce single-use plastics at events. Long-term: lead a sustainable, accessible festival programme that measures social impact.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Future direction -->
+    <section id="future" class="container">
+      <h2>Future Direction & Aspirations</h2>
+      <p class="muted">I aim to progress into leadership roles that combine creative design with operational best practice — producing immersive experiences across the UK, US and global markets.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px">
+        <div class="card" style="min-width:240px;flex:1">
+          <h3>Short-term</h3>
+          <p class="small">Consolidate operations leadership, secure Artist Liaison or Operations Manager roles and complete MSc modules in immersive design.</p>
+        </div>
+        <div class="card" style="min-width:240px;flex:1">
+          <h3>Long-term</h3>
+          <p class="small">Lead creative teams for immersive festivals and VIP programmes with measurable sustainability outcomes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="container">
+      <div class="grid">
+        <div class="col-8">
+          <h2>Contact & Availability</h2>
+          <p class="muted">I am available for freelance roles and leadership opportunities. For enquiries, job matches or collaborations, please reach out.</p>
+          <form id="contactForm" class="card" onsubmit="handleContact(event)" aria-labelledby="contactHeading">
+            <label for="name">Name</label>
+            <input id="name" name="name" required style="width:100%;padding:10px;margin-top:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit">
+            <label for="email" style="margin-top:10px;display:block">Email</label>
+            <input id="email" type="email" name="email" required style="width:100%;padding:10px;margin-top:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit">
+            <label for="message" style="margin-top:10px;display:block">Message</label>
+            <textarea id="message" name="message" rows="4" style="width:100%;padding:10px;margin-top:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit"></textarea>
+            <div style="margin-top:12px;display:flex;gap:8px">
+              <button class="btn primary" type="submit">Send message</button>
+              <button class="btn" type="button" onclick="copyContact()">Copy email</button>
+            </div>
+            <p id="formMsg" class="muted small" style="margin-top:10px"></p>
+          </form>
+        </div>
+
+        <aside class="col-4">
+          <div class="card">
+            <h3>Quick contact</h3>
+            <p class="small">Email: <a href="mailto:sydymo@googlemail.com">sydymo@googlemail.com</a></p>
+            <p class="small">Phone: 07961 936070</p>
+            <p class="small muted">Prefer recruiters? Send role details and salary band.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="small muted">© Sylvia Morrison — Interactive Web CV • Designed for assessment submission. Replace placeholder images and links with real assets before publishing.</div>
+    </div>
+  </footer>
+
+  <script>
+    // Smooth interactions, accessible defaults
+    (function(){
+      // Tiles keyboard activation
+      document.querySelectorAll('.tile').forEach(function(tile){
+        tile.addEventListener('keydown', function(e){
+          if(e.key === 'Enter' || e.key === ' '){
+            e.preventDefault(); tile.classList.toggle('active');
+            tile.style.transform = tile.classList.contains('active') ? 'translateY(-4px)' : 'none';
+          }
+        })
+        tile.addEventListener('click', function(){
+          this.style.transform = this.style.transform ? '' : 'translateY(-4px)';
+          setTimeout(()=>{ this.style.transform = '' },400)
+        })
+      })
+
+      // Download CV button builds a simple text CV as Blob. Replace with your PDF link if hosted.
+      document.getElementById('downloadCV').addEventListener('click', function(e){
+        e.preventDefault();
+        const cvText = `Sylvia Morrison\nEvent Designer | VIP Show Rep | Artist Liaison\nEmail: syddymo@googlemail.com\nPhone: 07961 936070\n\nProfile:\nCreative and operational event professional with festival and VIP experience. Master\'s in Event Design & Management (in progress).`;
+        const blob = new Blob([cvText], {type: 'text/plain'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'Sylvia-Morrison-CV.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      })
+
+    })();
+
+    function handleContact(e){
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const msg = document.getElementById('message').value.trim();
+      // This is a client-side demo — in a real site you would POST to a backend or use a service (Formspree, Netlify Forms)
+      document.getElementById('formMsg').innerText = 'Thanks ' + (name || '') + ". This form is a demo — copy the email or use the contact link to message directly.";
+      document.getElementById('contactForm').reset();
+    }
+    function copyContact(){
+      navigator.clipboard && navigator.clipboard.writeText('sydymo@googlemail.com').then(()=>{
+        alert('Email copied to clipboard');
+      }).catch(()=>{ alert('Copy failed — please copy manually: syddymo@googlemail.com') })
+    }
+  </script>
+</body>
+</html>
